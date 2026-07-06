@@ -76,7 +76,14 @@ Sistem secara otomatis mengklasifikasikan parameter minyak transformator ke dala
 
 #### 4.2 Lapis Diagnosis Kegagalan Aktif (Rel 2 - DGA Diagnostics)
 * **Gas Generation Rate (GGR):** Menghitung laju perubahan gas terlarut antar waktu ($CH_4, H_2, C_2H_4, C_2H_6, C_2H_2$):
-  $$\text{GGR}_{gas} = \frac{\text{Gas}_{t_2} - \text{Gas}_{t_1}}{t_2 - t_1}$$
+  The Gas Generation Rate (GGR) is calculated using
+
+$$
+\mathrm{GGR}_{\mathrm{gas}}
+=
+\frac{\mathrm{Gas}_{t_2}-\mathrm{Gas}_{t_1}}
+{t_2-t_1}
+$$
 * **Duval Triangle Method 1:** Pemetaan koordinat persentase rasio hidrokarbon ke dalam 6 zona kegagalan (PD, D1, D2, T1, T2, T3).
 * **AI Random Forest Classifier (7 Kelas):** Model klasifikasi probabilistik yang telah dilatih dengan data normal IEEE dan data kerusakan trafo industri untuk memetakan tingkat keyakinan diagnosis (`Diagnosis_AI` & `Keyakinan_%`).
 
