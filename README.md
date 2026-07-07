@@ -1,188 +1,104 @@
-
-
 # PRODUCT REQUIREMENT DOCUMENT (PRD)
-## Digital Twin & Predictive Maintenance Dashboard Transformator Daya Berbasis AI (Hybrid IEEE/IEC Standar)
+## Digital Twin & Predictive Maintenance Dashboard (MVP Edition: Time-to-Fault & Asynchronous Data)
 
-**Doc Version:** 1.0  
-**Author:** Mahasiswa Kerja Praktik Teknik Elektro/Sistem Kontrol ITB  
-**Target Audience:** Mentor Lapangan, Reliability Engineer, & Management PT Chandra Asri Pacific Tbk  
-**Date:** Juli 2026  
+**Doc Version:** 1.0 (Pragmatic MVP)
+**Author:** Mahasiswa Kerja Praktik Teknik Elektro/Sistem Kontrol ITB
+**Target Audience:** Mentor Lapangan, Reliability Engineer, & Management PT Chandra Asri Pacific Tbk
+**Date:** Juli 2026
 
 ---
 
 ### 1. EXECUTIVE SUMMARY & PROBLEM STATEMENT
 
 #### 1.1 Latar Belakang
-Transformator daya utama (*Main Substation Transformer*) merupakan jantung distribusi listrik pabrik petrokimia yang menuntut keandalan (*reliability*) 100% dan *zero unplanned downtime*. Metode pemantauan rutin saat ini umumnya masih bersifat statis (*snapshot classification*), di mana analisis laboratorium minyak isolasi (Dissolved Gas Analysis/DGA & *Oil Analysis*) dievaluasi secara terpisah dan hanya menilai kondisi pada satu titik waktu saat sampel diambil.
+Transformator daya utama (*Main Substation Transformer*) menuntut keandalan operasional tingkat tinggi. Tantangan terbesar di lapangan saat ini adalah perbedaan frekuensi ketersediaan data. Data *Dissolved Gas Analysis* (DGA) sering kali lebih rutin dipantau atau disimulasikan ketimbang data *Oil Analysis* (OA) kelistrikan-fisik (seperti Tegangan Tembus/BDV dan Keasaman) yang mengandalkan uji laboratorium eksternal setiap 6 hingga 12 bulan sekali. Hal ini menciptakan celah visibilitas yang menghambat transisi dari perawatan preventif menjadi prediktif.
 
 #### 1.2 Pernyataan Masalah (*Problem Statement*)
-1. **Analisis Terfragmentasi:** Evaluasi gas terlarut (DGA) sering kali dipisahkan dari analisis degradasi fisik-kimiawi minyak isolasi (*Oil Analysis*), sehingga teknisi kehilangan gambaran holistik kesehatan transformator.
-2. **Keterbatasan Evaluasi Statis:** Nilai parameter di bawah ambang batas bahaya sering kali dianggap "Aman", padahal laju kenaikannya (*rate of change*) mungkin sedang melonjak eksponensial dalam rentang waktu singkat.
-3. **Kebutuhan Preskriptif:** Manajemen dan teknisi tidak hanya membutuhkan diagnosis *jenis kerusakan saat ini*, tetapi membutuhkan perkiraan **kapan transformator berisiko mengalami kegagalan (*Remaining Useful Life / RUL*)** dan **tindakan perawatan preskriptif apa yang harus segera dieksekusi**.
+1. **Asinkronisasi Data (Data Gap):** Ketidaksesuaian waktu antara pengambilan sampel DGA dan pengujian OA membuat sistem pemantauan konvensional kesulitan memberikan gambaran yang utuh pada satu titik waktu (bulan berjalan).
+2. **Kesesatan Prediksi Fisik:** Memaksa algoritma untuk meramal nilai parameter fisik (BDV, IFT) di masa depan tanpa data suhu dan pembebanan harian adalah cacat secara fundamental teknik.
+3. **Ilusi RUL Berbasis Oli:** Memprediksi Sisa Umur (*Remaining Useful Life* / RUL) trafo murni dari data oli menghasilkan fluktuasi angka palsu ("Presisi Palsu"), karena oli dapat dipurifikasi, sementara umur sejati trafo berada pada kertas isolasinya.
 
-#### 1.3 Solusi yang Diusulkan (*Proposed Solution*)
-Membangun purwarupa (*Proof of Concept / PoC*) **Digital Twin & Predictive Dashboard terintegrasi Microsoft Power BI** untuk 1 unit Transformator Kritis pabrik. Sistem ini memadukan 3 lapis analisis (*Hybrid Intelligence*):
-* **Rel 1 (Standard Deterministik):** Skrining batas kesehatan minyak isolasi berdasarkan IEEE C57.104 & IEC 60422 Edition 4.0.
-* **Rel 2 (Geometri Diagnosis):** Pemetaan klasifikasi kegagalan aktif menggunakan Segitiga Duval Klasik & Rasio Rogers.
-* **Rel 3 (Machine Learning Prognostics):** Prediksi laju degradasi bersambung (*Time-Series Forecasting*) dan estimasi sisa umur pakai (*Remaining Useful Life / RUL*).
+#### 1.3 Solusi yang Diusulkan (Pragmatic MVP)
+Membangun purwarupa *Minimum Viable Product* (MVP) **Digital Twin Dashboard di Power BI** yang beroperasi selaras dengan realitas operasional ketersediaan data di lapangan. Sistem MVP ini berfokus pada:
+* **Metode Penahanan Data (Jangkar Realita):** Membekukan status parameter OA terakhir hingga ada *update* lab terbaru.
+* **Prognosis Waktu Menuju Kegagalan (*Time-to-Fault*):** Berbasis deret waktu (historis) evolusi gas DGA.
+* **Kalkulasi RUL Sejati:** Berbasis ekstraksi molekul Furan (2-FAL) dari kertas selulosa.
 
 ---
 
 ### 2. OBJECTIVES & PROJECT SCOPE
 
 #### 2.1 Tujuan Proyek (*Objectives*)
-* **Membangun sistem pemantauan terpusat** di Power BI yang memproses data uji lab Excel secara otomatis tanpa intervensi manual yang rumit.
-* **Mengurangi alarm palsu (*False Alarm*)** melalui validasi silang antara kondisi normal standar IEEE dengan kecerdasan buatan (*Machine Learning*).
-* **Memberikan visibilitas masa depan (*Prognostics*)** mengenai kurva degradasi parameter kritis hingga 12–24 bulan ke depan.
-* **Menghasilkan rekomendasi tindakan preskriptif** sesuai standar IEC 60422 Tabel 5 & 6 (*Reconditioning*, *Reclaiming*, atau *Passivation*).
+* Mengakomodasi kesenjangan jadwal uji lab (DGA vs OA) secara elegan tanpa menghasilkan alarm palsu atau metrik kosong di dasbor.
+* Menerjemahkan laju tren historis DGA menjadi informasi zona waktu peringatan dini (misal: "Proyeksi D1 dalam 1-3 Bulan").
+* Memberikan kepastian metrik degradasi aset menggunakan perhitungan standar internasional (IEC 61198) untuk kertas trafo.
 
 #### 2.2 Batasan Ruang Lingkup (*Scope Boundary*)
-| Kategori | In-Scope (Akan Dikerjakan) | Out-of-Scope (Bukan Prioritas Saat Ini) |
+| Kategori | In-Scope (MVP) | Out-of-Scope (Fase Selanjutnya) |
 | :--- | :--- | :--- |
-| **Aset Target** | Fokus pada **1 unit Trafo Kritis** pabrik (*Single-Asset PoC*). | Implementasi massal untuk seluruh trafo distribusi kecil di pabrik. |
-| **Integrasi Data** | Impor historis file Excel (*Offline/Batch Processing*) ke Power BI. | Pemasangan sensor *real-time* langsung via IoT ke fisik trafo. |
-| **Domain Analisis** | DGA (IEEE C57.104/Duval) + Oil Analysis (IEC 60422). | Analisis *Furanic compound* mendalam atau uji tegangan impuls fisik lab. |
+| **Aset Target** | 1 unit Trafo Kritis pabrik (*Single-Asset PoC*). | Ekspansi massal multi-aset. |
+| **Integrasi Data** | Pemrosesan longitudinal data CSV/Excel (DGA, Furan, OA). | *Real-time Streaming* sensor IoT (Suhu, Beban). |
+| **Target Prediksi** | Prediksi Deret Waktu DGA (Time-to-Fault) & Furan. | Prediksi harian degradasi fisik (BDV/Acidity). |
 
 ---
 
 ### 3. ARSITEKTUR SISTEM & ALUR KERJA (*WORKFLOW*)
 
-Sistem dirancang dengan alur pemrosesan data linier di dalam ekosistem Microsoft Power BI yang didukung oleh skrip *backend* Python di dalam Power Query:
-```
-[Data Lab Excel (Longitudinal)] 
+MVP ini menggunakan Python sebagai *backend prognostic engine* dan DAX Power BI sebagai pengendali antarmuka (*Asynchronous Data Handler*).
+
+```text
+[Dataset Historis CSV: DGA, Furan, OA] 
            │
            ▼
-[Power BI Power Query Editor] ────────► [Python Engine (joblib .pkl / script)]
-           │                                      │
-           │                                      ├── 1. Feature Engineering (Rasio Gas & GGR)
-           │                                      ├── 2. Evaluasi Skrining IEEE C57.104 & IEC 60422
-           │                                      ├── 3. Diagnosis AI (Random Forest 7 Kelas)
-           │                                      └── 4. Time-Series Trend & RUL Estimation
-           ▼
-[Tabel Diperkaya (Enriched Dataset)]
+[Python Engine - Data Pre-Processing & ML]
+           ├── 1. Forecasting DGA (ARIMA/Prophet) ─► Prediksi Profil Gas Masa Depan
+           ├── 2. Diagnosis Masa Depan ────────────► Eksekusi Duval Triangle AI dari Data Proyeksi
+           └── 3. Kalkulasi DP Kertas via Furan ───► True RUL (Sisa Umur Valid)
            │
            ▼
-[Power BI Executive Dashboard] (KPI Card, Duval Chart, Proyeksi RUL, Prescriptive Action)
+[Power BI Dashboard - Presentasi Visual]
+           ├── Panel DGA Forecasting (Grafik Tren + Confidence Interval)
+           ├── Panel Peringatan (Zona Waktu Menuju Fault D1/D2/T2 dll.)
+           └── Panel OA Terakhir (Gauge Meter Statis dengan DAX LASTNONBLANKVALUE)
 ```
 ### 4. TECHNICAL SPECIFICATIONS & CORE CAPABILITIES
 
-#### 4.1 Lapis Skrining Fisika & Kimiawi (Rel 1 - Standard Compliance)
-Sistem secara otomatis mengklasifikasikan parameter minyak transformator ke dalam status Good, Fair, atau Poor berdasarkan standar IEC 60422 Edition 4.0:
-* **Breakdown Voltage (BDV):** Evaluasi ketahanan tegangan tembus berdasarkan kategori trafo (>60 kV untuk Kategori O/A; >50 kV untuk Kategori B).
-* **Moisture in Oil ($W_{abs}$):** Evaluasi kandungan air absolut dengan koreksi suhu normalisasi ke 20°C serta persentase kejenuhan air (Moisture Saturation).
-* **Acidity (Neutralization Value):** Evaluasi laju penuaan kimiawi (<0.10 mg KOH/g untuk Good; >0.15 mg KOH/g untuk Poor pada Kategori O/A/D).
-* **Interfacial Tension (IFT):** Deteksi dini kontaminan polar larut dan lumpur (sludge) (<22 mN/m mengindikasikan Poor).
-* **Inhibitor Content:** Pemantauan cadangan aditif antioksidan (DBPC/DBP); peringatan dini jika turun di bawah 40% dari nilai awal.
+#### 4.1 Lapis 1: Asynchronous Data Fusion (Penahanan Data OA)
+Mengingat data *Oil Analysis* (BDV, Acidity, Water Content, IFT) hanya diperbarui secara sporadis (misal: setahun sekali), MVP ini menggunakan pendekatan **Jangkar Realita (*Reality Anchor*)**.
+* Dasbor Power BI menggunakan fungsi DAX `LASTNONBLANKVALUE` untuk parameter fisik.
+* **Mekanisme:** Jika lab mengeluarkan hasil BDV 60 kV pada bulan Januari, visualisasi *Gauge Meter* untuk BDV akan menahan dan menampilkan angka 60 kV secara statis pada bulan Februari, Maret, hingga ada input data lab terbaru di bulan Juli.
+* **Tujuan:** Menghindari manipulasi matematis tebakan untuk besaran fisik yang membingungkan operator, sembari tetap menjaga *readiness* dasbor untuk menampilkan data terbaru kapan pun lab merilis hasilnya.
 
-### 4.2 Lapis Diagnosis Kegagalan Aktif (Rel 2 – DGA Diagnostics)
+#### 4.2 Lapis 2: Sisa Umur Kertas (Furan - IEC 61198)
+Umur trafo tidak diukur dari pelumasnya, melainkan direpresentasikan oleh kekuatan kertas isolasi (*Degree of Polymerization* / DP). MVP ini mengekstrak kadar 2-Furfural (2-FAL) dan menghitung nilai DP menggunakan Persamaan Chendong:
 
-#### Gas Generation Rate (GGR)
+$$DP = \frac{\log_{10}(\text{2-FAL}) - 1.51}{-0.0035}$$
 
-Gas Generation Rate (GGR) digunakan untuk mengukur laju perubahan konsentrasi gas terlarut antar dua waktu pengujian. Perhitungan dilakukan untuk setiap gas utama, yaitu **H₂, CH₄, C₂H₆, C₂H₄,** dan **C₂H₂**. Parameter ini berfungsi sebagai indikator dini percepatan degradasi transformator, sehingga tren kenaikan gas dapat dianalisis sebelum konsentrasi gas mencapai ambang batas menurut IEEE C57.104.
+Nilai DP dikonversi menjadi persentase Indeks Kesehatan Kertas (RUL Sejati). Jika DP mendekati batas kegagalan mekanis (angka 200), dasbor akan memicu alarm peringatan dini.
 
-The Gas Generation Rate (GGR) is calculated as
-
-$$
-\mathrm{GGR}_{\text{gas}}
-= \frac{C_{t_2}-C_{t_1}}
-{\Delta t}
-$$
-
-where
-
-$$
-\Delta t=t_2-t_1
-$$
-
-with
-
-- $C_{t_1}$ : gas concentration at the initial sampling time (ppm)
-- $C_{t_2}$ : gas concentration at the subsequent sampling time (ppm)
-- $\Delta t$ : time interval between two sampling events (days or months)
-- $\mathrm{GGR}_{\text{gas}}$ : Gas Generation Rate (ppm/day or ppm/month)
-
-A positive GGR indicates continuous gas generation due to active fault development, whereas a negative value generally reflects gas reduction following maintenance activities such as oil filtration or degassing. Therefore, historical maintenance records are incorporated into the analysis to prevent false interpretation of transformer health trends.
+#### 4.3 Lapis 3: Time-to-Fault Forecasting (Prediksi DGA)
+Alih-alih memberikan satu angka "Sisa Waktu" yang rentan berfluktuasi, MVP ini menggunakan sistem **Zona Waktu Proyeksi**:
+* AI (model *Time-Series*) memproyeksikan laju pembentukan gas pembakaran utama (seperti Ethylene dan Acetylene) ke masa depan.
+* Titik proyeksi tersebut disilangkan ke dalam batas Segitiga Duval (Otak 1 Klasifikasi).
+* Keluaran diubah menjadi rentang peringatan proaktif. Contoh output pada dasbor: **"Proyeksi D2: Zona Waktu Menengah (3 - 6 Bulan Ke Depan)."** Hal ini memberikan kenyamanan UI/UX sekaligus akurasi teknis tanpa presisi palsu.
 
 ---
 
-#### Duval Triangle Method 1
+### 5. DATA REQUIREMENTS (KEBUTUHAN DATA)
 
-The Duval Triangle Method is employed to identify active fault types based on the relative proportions of **CH₄**, **C₂H₄**, and **C₂H₂**. The calculated gas percentages are projected onto the Duval Triangle, allowing automatic classification into one of the following fault zones:
+MVP ini dikembangkan dan diuji menggunakan kumpulan dataset longitudinal (riwayat DGA, Furan, dan OA) dengan kebutuhan struktur spesifik:
 
-- Partial Discharge (PD)
-- Low Energy Discharge (D1)
-- High Energy Discharge (D2)
-- Thermal Fault < 300°C (T1)
-- Thermal Fault 300–700°C (T2)
-- Thermal Fault > 700°C (T3)
-
-This diagnostic layer complements the deterministic evaluation defined in IEEE C57.104 by providing fault localization based on hydrocarbon gas composition.
-
----
-
-#### AI Random Forest Classifier (7-Class Diagnosis)
-
-To improve diagnostic reliability, the system incorporates a supervised **Random Forest Classifier** trained using transformer fault datasets derived from IEEE references and industrial historical records.
-
-The input features include:
-
-- Individual DGA gas concentrations
-- Gas Generation Rate (GGR)
-- Rogers Ratios
-- Duval Triangle coordinates
-- Oil Analysis parameters (BDV, Moisture, Acidity, IFT, and Inhibitor)
-
-The classifier produces:
-
-- **Diagnosis_AI** : predicted transformer fault class
-- **Confidence (%)** : prediction confidence level
-- **Fault Probability Distribution** : probability of each fault category
-
-The AI prediction is not intended to replace IEEE or IEC standards. Instead, it serves as an intelligent decision-support layer that complements deterministic diagnostics through probabilistic pattern recognition and historical trend analysis.
-  
-#### 4.3 Lapis Prognosis Masa Depan & RUL (Rel 3 - Predictive Engine)
-* **Proyeksi Tren Longitudinal:** Model memetakan tren historis untuk memprediksi nilai gas dan parameter kimiawi minyak (seperti BDV dan Acidity) di masa depan.
-* **Remaining Useful Life (RUL):** Perhitungan estimasi waktu menuju ambang batas kegagalan kritis (Failure Threshold).
-* **Mesin Rekomendasi Preskriptif:** Menghasilkan keluaran teks otomatis berdasarkan IEC 60422 Tabel 6, contoh:
-  > "Peringatan: Tren Acidity meningkat tajam dan diproyeksikan menembus 0.15 mg KOH/g dalam 180 hari. Dijadwalkan tindakan Reclaiming (Fuller's Earth Treatment) sebelum terbentuk presipitasi lumpur."
-
----
-
-### 5. DATA REQUIREMENTS (KEBUTUHAN DATA DARI CHANDRA ASRI)
-Untuk dapat melatih model prediksi longitudinal dan memvalidasi purwarupa ini, diperlukan dukungan data historis dari pihak pabrik dengan spesifikasi sebagai berikut:
-
-#### 5.1 Spesifikasi Data yang Diminta
-Data riwayat pengujian laboratorium minyak isolasi dari 1 atau 2 unit Transformator Utama (Main Substation) yang dirunut secara waktu (time-series) selama minimal 3 hingga 5 tahun terakhir (atau minimal 8–15 kali pengujian berurutan).
-
-#### 5.2 Format Kebutuhan Kolom Data (Tabel Excel/CSV)
-| Kategori Parameter | Nama Kolom Wajib | Satuan | Keterangan / Kegunaan |
-| :--- | :--- | :--- | :--- |
-| **Identitas & Waktu** | `ID_Trafo`, `Tanggal_Uji` | Text, YYYY-MM-DD | Sumbu temporal utama untuk analisis deret waktu (time-series). |
-| **Suhu Sampling** | `Suhu_Oli_Sampling` | °C | Koreksi kejenuhan air dan normalisasi BDV/Resistivitas. |
-| **Gas DGA Utama** | `H2`, `CH4`, `C2H6`, `C2H4`, `C2H2` | ppm | Evaluasi Segitiga Duval & Gas Generation Rate (GGR). |
-| **Gas Kertas Selulosa** | `CO`, `CO2` | ppm | Pemantauan laju degradasi isolasi kertas belitan. |
-| **Kualitas Fisik (OA)** | `Breakdown_Voltage` (BDV) | kV | Indikator kekuatan dielektrik minyak isolasi (IEC 60422). |
-| **Kandungan Air (OA)** | `Water_Content` ($W_{abs}$) | mg/kg | Indikator kelembaban minyak dan risiko kondensasi. |
-| **Kualitas Kimia (OA)** | `Acidity` | mg KOH/g | Laju oksidasi dan penuaan kimiawi pelumas. |
-| **Tegangan Muka (OA)** | `Interfacial_Tension` (IFT) | mN/m | Deteksi kontaminan polar larut dan bibit lumpur (sludge). |
-| **Rugi Daya (OA)** | `DDF_TanDelta` ($\tan\delta$) | % / desimal | Rugi-rugi dielektrik pada suhu operasi/90°C. |
-| **Kandungan Aditif** | `Inhibitor_DBPC` | % weight | Pemantauan konsumsi antioksidan sintetis. |
-
-#### 5.3 Catatan Buku Harian Perawatan (Maintenance Log Book)
-Daftar tanggal dan tindakan perawatan yang pernah dilakukan pada trafo target tersebut (misal: Filtrasi/Dehidrasi pada 12 Mei 2024, atau Ganti Oli/Topping-up pada Agustus 2025). Data ini mutlak diperlukan agar AI tidak salah membaca penurunan gas akibat filtrasi sebagai penyembuhan alamiah transformator.
+| Kategori Parameter | Kolom Wajib (*Mandatory*) | Kegunaan dalam MVP |
+| :--- | :--- | :--- |
+| **Sumbu Waktu** | `Tanggal_Uji` / `Bulan_Ke` | Sumbu temporal mutlak untuk eksekusi algoritma *forecasting*. |
+| **DGA (Gas Utama)** | `H2`, `CH4`, `C2H6`, `C2H4`, `C2H2` | Bahan baku model proyeksi mesin waktu & klasifikasi Duval. |
+| **Parameter Kertas** | `Furan_2FAL` | Parameter tunggal penghitung RUL (Kalkulasi Chendong). |
+| **Kualitas Fisik (OA)**| `BDV`, `Acidity`, `Water`, `IFT` | Disimpan dan ditahan sebagai Jangkar Realita (Status Lab Terakhir). |
 
 ---
 
 ### 6. TECHNOLOGY STACK & DEPENDENCIES
-| Komponen | Teknologi / Library | Fungsi Utama |
-| :--- | :--- | :--- |
-| **Pusat Analisis Model** | Python 3.12 (Google Colab / VS Code) | Exploratory Data Analysis (EDA), rekayasa fitur, dan pelatihan AI. |
-| **Library ML & Data** | `scikit-learn`, `pandas`, `numpy`, `joblib` | Pembuatan model Random Forest, pemrosesan rasio, dan serialisasi `.pkl`. |
-| **Visualization Platform** | Microsoft Power BI Desktop | Pembangunan Dasbor eksekutif, antarmuka visual, dan integrasi DAX. |
-| **Script Integration** | Power Query Python Script Wrapper | Menjalankan model AI secara lokal langsung di dalam tabel Power BI. |
 
----
-### 7. SUCCESS METRICS (KRITERIA KEBERHASILAN)
-1. **Keakuratan Klasifikasi AI:** Model AI minimal mencapai akurasi >85% dan Recall >95% pada deteksi bahaya kritis (busur api D2 dan panas ekstrem T3) pada uji validasi.
-2. **Kesesuaian Standar:** Dasbor berhasil memisahkan trafo sehat (Normal) dan trafo anomali secara konsisten tanpa menghasilkan alarm palsu (false alarm) pada kondisi gas normal di bawah spesifikasi IEEE C57.104.
-3. **Penerimaan Pengguna (Usability):** Waktu pemrosesan data uji lab baru mulai dari input Excel hingga keluar diagnosis dan estimasi RUL di layar Power BI membutuhkan waktu <10 detik.
+* **Python (Scikit-Learn, Statsmodels, Pandas):** Untuk pembersihan data temporal, penarikan trendline/forecasting, dan penghitungan DP secara *batch processing*.
+* **Microsoft Power BI:** Untuk implementasi lapisan antarmuka pengguna, pengaturan filter asinkron (DAX), dan penyajian metrik prediksi secara visual.
+* **Standar Industri Referensi:** IEC 61198 (Metode Uji Senyawa Furanic) & IEEE C57.104 (Interpretasi DGA).
